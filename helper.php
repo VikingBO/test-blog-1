@@ -43,18 +43,7 @@ function saveImg (string $tempImg): string
 
                     break;
                 case UPLOAD_ERR_OK:
-                    checkImg($_FILES['send_file']['type']);
-                        case 'image/jpeg':
-                        case 'image/png':
-                        case 'image/gif':
-                            $check = TRUE;
-
-                            break;
-                        default:
-                            $result = 'Вы не можете загружать файлы данного формата.<br>';
-
-                            break;
-                    }
+                    $check = checkImg($_FILES['send_file']['type']);
 
                     break;
                 case UPLOAD_ERR_PARTIAL:
@@ -72,7 +61,7 @@ function saveImg (string $tempImg): string
             $linkfile = $_SERVER['HTTP_HOST'] . '/images/' . basename($_FILES['send_file']['name']);
 
             if ($check && move_uploaded_file($_FILES['send_file']['tmp_name'], $uploadfile)) {
-                $result .= "Фaйл был загружен успешно.<br>";
+                $result .= $linkfile;
             } else {
                 $result .= 'Что то с файлом не так, он не прошел проверку и небыл загружен.<br>';
             }
@@ -100,4 +89,48 @@ function checkImg (string $src): bool
     }
 
     return $result;
+}
+
+function addRecord ($dataRecord): int
+{
+    global $PDO;
+
+    $recordId = -1;
+
+    $queryString = "INSERT INTO `records` (`title`, `content`, `img_id`, `user_id`) VALUE (";
+
+    if (is_array($dataRecord)) {
+        $queryString .= "'{$dataRecord['title']}',";
+        $queryString .= "'{$dataRecord['content']}',";
+        $queryString .= "'{$dataRecord['img_id']}',";
+        $queryString .= "'{$dataRecord['user_id']}'";
+    } else if (is_object($dataRecord)) {
+        $queryString .= "'{$dataRecord->title}',";
+        $queryString .= "'{$dataRecord->content}',";
+        $queryString .= "'{$dataRecord->img_id}',";
+        $queryString .= "'{$dataRecord->user_id}'";
+    }
+
+    try {
+        $PDO->exec($queryString);
+        $recordId = $PDO->lastInsertId();
+    } catch (PDOException $e) {
+        log($e->getMessage());
+    }
+
+    return $recordId;
+}
+
+function updateRecord (int $recordId): bool
+{
+
+}
+
+function deleteRecord (int $recordId): bool
+{
+
+}
+
+function log ($message) {
+    $file = file_get_contents(__DIR__ . '/log.txt');
 }

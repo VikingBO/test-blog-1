@@ -11,3 +11,17 @@
  * Email: pilipenkoavspb@gmail.com
  * Date: 03.01.2019
  */
+
+require_once "helper.php";
+
+if (empty($_GET)) {
+    require_once "record_list.php";
+} else {
+
+
+    if (!empty($_GET["record_id"])) {
+        getRecord($_GET["record_id"]);
+    }
+
+    require_once "save_record_form.php";
+}

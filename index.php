@@ -15,22 +15,37 @@ require_once 'helper.php';
 
 $query = $PDO->query('SELECT * FROM `records` ORDER BY `add_time` DESC LIMIT 20');
 
-$records = !empty($query) ? $query->fetchAll() : [];
+$records = !empty($query) ? $query->fetchAll() : [
+    [
+        'title' => "Записей нет"
+    ]
+];
 
-$data['body'] = "<div class='container'>";
+$data['body'] = '<div class="container text-center">
+        <div class="row">
+            <div class="col-12">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Записи блога</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
 
 foreach ($records as $record) {
-    $record['anons'] .= "<a href='/record?id={$record['id']}'>Читать дальше...</a>";
+    $recordLink = empty($record['id']) ? "<p>{$record['title']}</p>" : "<a href='/record.php?id={$record['id']}'>{$record['title']}</a>" ;
 
-    $data['body'] .= "<div class='row'>
-                        <div class='col-lg-12'>
-                            <div class='text-body'>
-                                <img src='{$record['img']}' alt='{$record['title']}' class='rounded float-left'>
-                                {$record['anons']}
-                                </div>
-                            </div>
-                        </div>
-                    </div>";
+    $data['body'] .= "<tr>
+                        <td>
+                            $recordLink
+                        </td>
+                    </tr>";
 }
+
+$data['body'] .= '</tbody>
+                </table>
+            </div>
+        </div>
+    </div>';
 
 require_once 'template.php';
